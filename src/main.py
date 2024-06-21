@@ -3,6 +3,8 @@ import discord
 import requests
 import json
 
+from fortuneCookie import FortuneCookie
+
 # You can use the dotenv package to load the environment variables from a .env file, if you do not have a .env file this is not necessary, just replace SECRET_TOKEN with your discord token
 from dotenv import load_dotenv
 
@@ -14,6 +16,8 @@ class MyClient(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__prefix_cmd = '&' 
+        # Composition
+        self.fortune_cookie = FortuneCookie()
 
     async def on_ready(self):
         print('Logged on as {0}!'.format(self.user))
@@ -29,6 +33,9 @@ class MyClient(discord.Client):
         if message.content.startswith(f'{self.__prefix_cmd}meme'):
             meme = await self.get_meme()
             await message.channel.send(meme)
+
+        if message.content.startswith(f'{self.__prefix_cmd}fortune'):
+            await message.channel.send(self.fortune_cookie.retrieve_fortune())
 
     async def get_meme(self):
         response = requests.get('https://meme-api.com/gimme')
